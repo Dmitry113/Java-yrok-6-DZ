@@ -1,0 +1,140 @@
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+
+class Laptop {
+    private String brand;
+    private int ram; // ОЗУ
+    private int hdd; // Объем ЖД
+    private String os; // Операционная система
+    private String color; // Цвет
+
+    public Laptop(String brand, int ram, int hdd, String os, String color) {
+        this.brand = brand;
+        this.ram = ram;
+        this.hdd = hdd;
+        this.os = os;
+        this.color = color;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public int getRam() {
+        return ram;
+    }
+
+    public int getHdd() {
+        return hdd;
+    }
+
+    public String getOs() {
+        return os;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public String toString() {
+        return "Laptop{" +
+                "brand='" + brand + '\'' +
+                ", ram=" + ram +
+                ", hdd=" + hdd +
+                ", os='" + os + '\'' +
+                ", color='" + color + '\'' +
+                '}';
+    }
+}
+
+public class LaptopStore {
+    private Set<Laptop> laptops;
+
+    public LaptopStore(Set<Laptop> laptops) {
+        this.laptops = laptops;
+    }
+
+    public void filterLaptops() {
+        Scanner scanner = new Scanner(System.in);
+        Map<String, String> criteria = new HashMap<>();
+
+        System.out.println("Введите цифру, соответствующую необходимому критерию:");
+        System.out.println("1 - ОЗУ");
+        System.out.println("2 - Объем ЖД");
+        System.out.println("3 - Операционная система");
+        System.out.println("4 - Цвет");
+
+        while (true) {
+            System.out.print("Ваш выбор (0 для завершения ввода критериев): ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // consume the newline
+
+            if (choice == 0)
+                break;
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Введите минимальное значение ОЗУ: ");
+                    criteria.put("ram", scanner.nextLine());
+                    break;
+                case 2:
+                    System.out.print("Введите минимальное значение объема ЖД: ");
+                    criteria.put("hdd", scanner.nextLine());
+                    break;
+                case 3:
+                    System.out.print("Введите операционную систему: ");
+                    criteria.put("os", scanner.nextLine());
+                    break;
+                case 4:
+                    System.out.print("Введите цвет: ");
+                    criteria.put("color", scanner.nextLine());
+                    break;
+                default:
+                    System.out.println("Некорректный выбор, попробуйте снова.");
+            }
+        }
+
+        // Фильтрация ноутбуков на основе введенных критериев
+        Set<Laptop> filteredLaptops = new HashSet<>(laptops);
+        for (Map.Entry<String, String> entry : criteria.entrySet()) {
+            filteredLaptops.removeIf(laptop -> {
+                switch (entry.getKey()) {
+                    case "ram":
+                        return laptop.getRam() < Integer.parseInt(entry.getValue());
+                    case "hdd":
+                        return laptop.getHdd() < Integer.parseInt(entry.getValue());
+                    case "os":
+                        return !laptop.getOs().equalsIgnoreCase(entry.getValue());
+                    case "color":
+                        return !laptop.getColor().equalsIgnoreCase(entry.getValue());
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Вывод результатов фильтрации
+        System.out.println("Ноутбуки, соответствующие критериям:");
+        for (Laptop laptop : filteredLaptops) {
+            System.out.println(laptop);
+        }
+    }
+
+    public static void main(String[] args) {
+        // Создание набора ноутбуков
+        Set<Laptop> laptops = new HashSet<>(Arrays.asList(
+                new Laptop("Dell", 8, 512, "Windows 10", "Black"),
+                new Laptop("HP", 16, 1024, "Windows 10", "Silver"),
+                new Laptop("Apple", 8, 256, "macOS", "Gray"),
+                new Laptop("Asus", 32, 2048, "Windows 10", "Black")));
+
+        // Создание экземпляра LaptopStore и запуск фильтрации
+        LaptopStore store = new LaptopStore(laptops);
+        store.filterLaptops();
+    }
+}
